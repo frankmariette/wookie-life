@@ -1,0 +1,9 @@
+!!! 5
+%html{:lang => "en"}
+%body
+  .container
+    %p Well, Hello there!
+    %p We're going to now talk to the GitHub API. Ready?
+      %a{ :href => "https://github.com/login/oauth/authorize?client_id=<%= cliend_id %>"} Click Here to begin
+    %p If that link doesn't work, remember to provide your own
+  	  %a{ :href => "/v3/oauth/#web-application-flow" } Client ID
