@@ -5,6 +5,16 @@ require 'rest-client'
 CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
 CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
 
+
+get '/main' do 
+  erb :home
+end
+
+get '/wow' do 
+  erb :wow
+end
+
+
 get '/' do 
 	erb :index, :locals => { :client_id => CLIENT_ID }
 end
