@@ -1,12 +1,10 @@
+ENV['RACK_ENV'] ||= 'development'
 require 'rubygems'
 require 'bundler/setup'
 require 'sinatra'
 require 'haml'
 require './wookie-life'
 
-set :environment, :development
-set :run, false
-set :raise_errors, true
+require File.expand_path(File.join(File.dirname(__FILE__), 'wookie-life'))
 
-run Sinatra::Application
-
+run WookieLife::WookieLifeApp

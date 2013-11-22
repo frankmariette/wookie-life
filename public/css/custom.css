@@ -1,0 +1,15 @@
+      .container {
+              margin-bottom: 15px;
+            }
+            .full {
+              width: 100%;
+            }
+            .container .btn {
+              margin-right: 10px;
+            }
+            
+            #code {
+              background-color: black;
+            }
+            
+          }

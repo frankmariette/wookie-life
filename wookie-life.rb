@@ -1,44 +1,47 @@
 require 'sinatra'
+require 'sinatra/auth/github'
 require 'haml'
 require 'rest-client'
 
-CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
-CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
+module WookieLife
+  class WookieLifeApp < Sinatra::Base
+    CLIENT_ID = ENV['GH_BASIC_CLIENT_ID']
+    CLIENT_SECRET = ENV['GH_BASIC_SECRET_ID']
 
+    enable :sessions
 
-get '/main' do 
-  erb :home
-end
+    set :github_options, {
+      :scopes       => "user",
+      :secret       => CLIENT_SECRET,
+      :client_id    => CLIENT_ID,
+      :callback_url => "/callback"
+    }
 
-get '/wow' do 
-  erb :wow
-end
+    register Sinatra::Auth::Github
 
+    get '/' do 
+    	redirect '/de'
+    end
 
-get '/' do 
-	erb :index, :locals => { :client_id => CLIENT_ID }
-end
+    get '/de' do
+      if !authenticated?
+        haml :home, :locals => {:client_id => CLIENT_ID}
+      else
+        access_token = github_user["token"]
+        auth_result = RestClient.get("https://api.github.com/user", {:params => {:access_token => access_token, :accept => :json},
+                                                                                   :accept => :json})
+        auth_result = JSON.parse(auth_result)
 
-get '/de' do
-	haml :index
-end
+    	 haml :home, :locals => { :login => auth_result["login"] }
+      end
+    end
 
-get '/callback' do
-  # get temporary GitHub code...
-  session_code = request.env['rack.request.query_hash']["code"]
-  # ... and POST it back to GitHub
-  result = RestClient.post("https://github.com/login/oauth/access_token",
-                          {:client_id => CLIENT_ID,
-                           :client_secret => CLIENT_SECRET,
-                           :code => session_code
-                           },{
-                            :accept => :json
-                            })
-  access_token = JSON.parse(result){"access_token"}
-end
-
-get '/basic' do
-  auth_result = RestClient.get("https://api.github.com/user", {:params => {:access_token => access_token}})
-
-  erb :basic, :locals => {:auth_result => auth_result}
+    get '/callback' do
+      if authenticated?
+        redirect "/de"
+      else
+        authenticate!
+      end
+    end
+  end
 end
